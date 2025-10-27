@@ -1,0 +1,315 @@
+:root {
+  /* === Light Mode Colors === */
+  --background-color: #f4f4f9;
+  --container-bg-color: #ffffff;
+  --header-bg-color: #0078ff;
+  --header-text-color: #ffffff;
+  --message-text-color: #333333;
+  --user-message-bg-color: #0078ff;
+  --bot-message-bg-color: #e9e9ee;
+  --input-bg-color: #fafafa;
+  --input-border-color: #ddd;
+  --button-bg-color: #468cdd;
+  --button-text-color: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.15);
+}
+
+/* === Dark Mode - Better Contrast === */
+body.dark-theme {
+  --background-color: #0f1419;
+  --container-bg-color: #1a1f2e;
+  --header-bg-color: #0078ff;
+  --header-text-color: #ffffff;
+  --message-text-color: #e5e7eb; /* Brighter text for better contrast */
+  --user-message-bg-color: #2563eb;
+  --bot-message-bg-color: #2d3748; /* Lighter background for bot messages */
+  --input-bg-color: #1e293b;
+  --input-border-color: #475569;
+  --button-bg-color: #2563eb;
+  --button-text-color: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure headings and lists are visible in dark mode */
+body.dark-theme .bot-message .message-content h1,
+body.dark-theme .bot-message .message-content h2,
+body.dark-theme .bot-message .message-content h3,
+body.dark-theme .bot-message .message-content h4 {
+  color: #ffffff; /* White headings */
+  border-bottom: 1px solid #475569;
+}
+
+body.dark-theme .bot-message .message-content ul,
+body.dark-theme .bot-message .message-content ol {
+  color: #e5e7eb; /* Brighter list text */
+}
+
+body.dark-theme .bot-message .message-content li {
+  color: #e5e7eb; /* Brighter list items */
+}
+
+body.dark-theme .bot-message .message-content strong {
+  color: #ffffff; /* White bold text */
+}
+
+/* === Body === */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--background-color);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* === Chat Container === */
+.chat-container {
+  width: 480px;
+  height: 690px;
+  background-color: var(--container-bg-color);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 25px var(--shadow-color);
+  overflow: hidden;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+/* === Header === */
+.chat-header {
+  background-color: var(--header-bg-color);
+  color: var(--header-text-color);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--input-border-color);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.chat-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* === Theme Switcher === */
+.checkbox {
+  opacity: 0;
+  position: absolute;
+}
+
+.checkbox-label {
+  background-color: #222;
+  width: 40px;
+  height: 24px;
+  border-radius: 50px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+}
+
+.checkbox-label .ball {
+  background-color: #fff;
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  transition: transform 0.3s linear;
+}
+
+.checkbox:checked + .checkbox-label .ball {
+  transform: translateX(18px);
+}
+
+.fa-moon {
+  color: #bbb;
+  font-size: 12px;
+}
+
+.fa-sun {
+  color: #f39c12;
+  font-size: 12px;
+}
+
+/* === Chat Messages === */
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  scroll-behavior: smooth;
+}
+
+/* === Message Container with Avatars === */
+.message {
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 0px 10px 0px;
+  max-width: 90%;
+  gap: 10px;
+}
+
+/* User message with avatar on right side */
+.user-message {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  
+}
+
+/* Bot message with avatar on left side */
+.bot-message {
+  align-self: flex-start;
+}
+
+/* Avatar styles */
+.message-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Message bubble styles */
+.message-content {
+  padding: 5px 10px 5px 10px; 
+  border-radius: 18px;
+  line-height: 1.4;
+  font-size: 14px;
+  max-width: calc(100% - 45px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* User message bubble */
+.user-message .message-content {
+  background-color: var(--user-message-bg-color);
+  color: white;
+   padding: 5px 10px 5px 10px; 
+  border-bottom-right-radius: 5px;
+}
+
+/* Bot message bubble */
+.bot-message .message-content {
+   align-self: flex-start;
+   padding-left: 20px;
+  background-color: var(--bot-message-bg-color);
+  color: var(--message-text-color);
+  border-bottom-left-radius: 5px;
+}
+
+/* === Input Area === */
+.chat-input-form {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--input-border-color);
+  background-color: var(--input-bg-color);
+  padding: 12px;
+  gap: 10px;
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 20px;
+  outline: none;
+  background-color: white;
+  color: var(--message-text-color);
+}
+
+body.dark-theme .chat-input {
+  background-color: #181b21;
+  color: white;
+}
+
+.send-button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.send-button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* === Scrollbar === */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #e9e9ee;
+  border-radius: 10px;
+}
+
+/* Typing Indicator Styles */
+.typing-indicator {
+    background-color: var(--bot-message-bg-color);
+    border-radius: 18px;
+    padding: 12px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom-left-radius: 5px;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: gray;
+    border-radius: 50%;
+    animation: typingBounce 1s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+    0%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-6px);
+    }
+}

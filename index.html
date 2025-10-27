@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot UI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+
+<body>
+    <main class="chat-container">
+        <header class="chat-header">
+            <div class="header-left">
+                <img src="images/logo.jpg" alt="Logo" class="chat-logo">
+                <h1>Chatbot</h1>
+            </div>
+            <input type="checkbox" class="checkbox" id="theme-switcher">
+            <label for="theme-switcher" class="checkbox-label">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+                <span class="ball"></span>
+            </label>
+        </header>
+
+        <div class="chat-messages" id="messages">
+            <!-- User Message -->
+            <div class="message user-message">
+                <img src="images/user profile.jpg" alt="User" class="message-avatar">
+                <div class="message-content">
+                    <p>Hello there!</p>
+                </div>
+            </div>
+
+            <!-- Bot Message -->
+            <div class="message bot-message">
+                <img src="images/profile1.jpg" alt="Chatbot" class="message-avatar">
+                <div class="message-content">
+                    <p>Hi! How can I help you today?</p>
+                </div>
+            </div>
+        </div>
+        <form class="chat-input-form" id="input-form">
+            <input type="text" id="input-field" class="chat-input" placeholder="Type a message..." autocomplete="off">
+            <button type="submit" class="send-button">Send</button>
+        </form>
+    </main>
+
+    <script src="index.js"></script>
+</body>
+
+</html>
