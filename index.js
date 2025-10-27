@@ -1,153 +1,134 @@
-const _config = {
-    // IMPORTANT: Do not hard-code your API key here. 
-    // This is a security risk. 
-    // In a real application, this should be handled by a backend proxy or environment variables.
-    apiKey: "YOUR_API_KEY_HERE",
-    endpoint: "https://api.openai.com/v1/chat/completions",
-    model: "gpt-4o-mini",
-    aiInstructions: "You are a helpful, general-purpose AI assistant. Your goal is to answer the user\'s questions accurately and concisely. Format your responses using clean HTML. Use headings, lists, and bold text where appropriate to make the information clear and easy to read.",
+let _config = {
+  openAI_api: "https://alcuino-chatbot.azurewebsites.net/api/OpenAIProxy",
+  openAI_model: "gpt-4o-mini",
+  ai_instruction: `You are a teacher who gives questions about JavaScript.
+    Output should be in HTML format.
+    Do not use markdown format; answer directly.`,
+  response_id: "",
 };
 
-const messagesContainer = document.getElementById('messages');
-const inputField = document.getElementById('input-field');
-const inputForm = document.getElementById('input-form');
+// Unified, cleaned-up request function
+async function sendOpenAIRequest(text) {
+  const requestBody = {
+    model: _config.openAI_model,
+    input: text,
+    instructions: _config.ai_instruction,
+  };
 
-let previousResponseId = null;
-
-inputForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const messageText = inputField.value.trim();
-    if (messageText) {
-        addUserMessage(messageText);
-        inputField.value = '';
-        await handleBotReply(messageText);
-    }
-});
-
-function addUserMessage(text) {
-    const messageElement = document.createElement('div');
-    messageElement.className = 'message user-message';
-    messageElement.innerHTML = `
-        <img src="images/user profile.jpg" alt="User" class="message-avatar">
-        <div class="message-content">
-            <p>${text}</p>
-        </div>
-    `;
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function addBotMessage(html) {
-    const messageElement = document.createElement('div');
-    messageElement.className = 'message bot-message';
-    messageElement.innerHTML = `
-        <img src="images/profile1.jpg" alt="Chatbot" class="message-avatar">
-        <div class="message-content">
-            ${html}
-        </div>
-    `;
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// === Typing Animation  ===
-function simulateBotReply() {
-    removeTypingIndicator();
-
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'message bot-message typing';
-    typingIndicator.innerHTML = `
-        <img src="images/profile1.jpg" alt="Chatbot" class="message-avatar">
-        <div class="typing-indicator">
-            <div class="typing-dots">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-    `;
-    typingIndicator.id = 'active-typing';
-    messagesContainer.appendChild(typingIndicator);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function removeTypingIndicator() {
-    const activeTyping = document.getElementById('active-typing');
-    if (activeTyping) {
-        messagesContainer.removeChild(activeTyping);
-    }
-}
-
-async function handleBotReply(userText) {
-    simulateBotReply();
-    try {
-        const botResponse = await getBotReply(userText, previousResponseId);
-        removeTypingIndicator();
-
-        if (botResponse && botResponse.choices && botResponse.choices.length > 0) {
-            const botHtml = botResponse.choices[0].message.content;
-            addBotMessage(botHtml);
-            previousResponseId = botResponse.id;
-        } else {
-            console.log('Bot response structure issue:', botResponse);
-            addBotMessage('Sorry, I had trouble getting a response.');
-        }
-    } catch (error) {
-        console.error('Full error details:', error);
-        console.error('Error message:', error.message);
-        removeTypingIndicator();
-        addBotMessage('Sorry, something went wrong. Check console for details.');
-    }
-}
-async function sendOpenAIRequest(text, prevId) {
-    const requestBody = {
-        model: _config.model,
-        messages: [
-            { role: 'system', content: _config.aiInstructions },
-            { role: 'user', content: text }
-        ],
-    };
-
-    if (prevId) {
-        // Optional: handle previous response ID if needed
-    }
-
-    const response = await fetch(_config.endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${_config.apiKey}`
-        },
-        body: JSON.stringify(requestBody)
+  try {
+    const response = await fetch(_config.openAI_api, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(data);
+
+    const output = data.output?.[0]?.content?.[0]?.text || "No response text found.";
+    _config.response_id = data.id || "";
+
+    return output;
+  } catch (error) {
+    console.error("Error calling OpenAI API:", error);
+    throw error;
+  }
 }
 
-async function getBotReply(text, previous_response_id) {
-    return await sendOpenAIRequest(text, previous_response_id);
+// === Chat UI Elements ===
+const messagesContainer = document.getElementById("messages");
+const inputField = document.getElementById("input-field");
+const inputForm = document.getElementById("input-form");
+
+inputForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const messageText = inputField.value.trim();
+  if (!messageText) return;
+
+  addUserMessage(messageText);
+  inputField.value = "";
+  await handleBotReply(messageText);
+});
+
+// === Message Functions ===
+function addUserMessage(text) {
+  const messageElement = document.createElement("div");
+  messageElement.className = "message user-message";
+  messageElement.innerHTML = `
+    <img src="images/user profile.jpg" alt="User" class="message-avatar">
+    <div class="message-content"><p>${text}</p></div>
+  `;
+  messagesContainer.appendChild(messageElement);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addBotMessage(html) {
+  const messageElement = document.createElement("div");
+  messageElement.className = "message bot-message";
+  messageElement.innerHTML = `
+    <img src="images/profile1.jpg" alt="Chatbot" class="message-avatar">
+    <div class="message-content">${html}</div>
+  `;
+  messagesContainer.appendChild(messageElement);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// === Typing Indicator ===
+function simulateBotReply() {
+  removeTypingIndicator();
+
+  const typingIndicator = document.createElement("div");
+  typingIndicator.className = "message bot-message typing";
+  typingIndicator.innerHTML = `
+    <img src="images/profile1.jpg" alt="Chatbot" class="message-avatar">
+    <div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+  `;
+  typingIndicator.id = "active-typing";
+  messagesContainer.appendChild(typingIndicator);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function removeTypingIndicator() {
+  const activeTyping = document.getElementById("active-typing");
+  if (activeTyping) messagesContainer.removeChild(activeTyping);
+}
+
+// === Bot Reply Handler ===
+async function handleBotReply(userText) {
+  simulateBotReply();
+
+  try {
+    const botResponse = await sendOpenAIRequest(userText);
+    removeTypingIndicator();
+    addBotMessage(botResponse);
+  } catch (error) {
+    console.error("Error:", error);
+    removeTypingIndicator();
+    addBotMessage("Sorry, something went wrong. Please try again.");
+  }
 }
 
 // === Theme Switcher ===
-const themeSwitcher = document.getElementById('theme-switcher');
+const themeSwitcher = document.getElementById("theme-switcher");
 const body = document.body;
 
-themeSwitcher.addEventListener('change', () => {
-    body.classList.toggle('dark-theme');
-    const isDarkMode = body.classList.contains('dark-theme');
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+themeSwitcher.addEventListener("change", () => {
+  body.classList.toggle("dark-theme");
+  const isDarkMode = body.classList.contains("dark-theme");
+  localStorage.setItem("theme", isDarkMode ? "dark" : "light");
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-theme');
-        themeSwitcher.checked = true;
-    } else {
-        body.classList.remove('dark-theme');
-        themeSwitcher.checked = false;
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    body.classList.add("dark-theme");
+    themeSwitcher.checked = true;
+  } else {
+    body.classList.remove("dark-theme");
+    themeSwitcher.checked = false;
+  }
 });
